@@ -1,3 +1,6 @@
+# (C) 2018 The University of Chicago
+# See COPYRIGHT in top-level directory.
+
 # Importing MPI from mpi4py triggers a call to MPI_Init,
 # which is needed by the Mobject provider.
 from mpi4py           import MPI
