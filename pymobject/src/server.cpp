@@ -20,12 +20,14 @@
 #include <sdskv-server.h>
 #include <sdskv-client.h>
 #include <bake-client.h>
+#include <ssg.h>
 
 BOOST_PYTHON_OPAQUE_SPECIALIZED_TYPE_ID(margo_instance)
 BOOST_PYTHON_OPAQUE_SPECIALIZED_TYPE_ID(mobject_server_context)
 BOOST_PYTHON_OPAQUE_SPECIALIZED_TYPE_ID(sdskv_server_context_t)
 BOOST_PYTHON_OPAQUE_SPECIALIZED_TYPE_ID(bake_provider_handle)
 BOOST_PYTHON_OPAQUE_SPECIALIZED_TYPE_ID(sdskv_provider_handle)
+BOOST_PYTHON_OPAQUE_SPECIALIZED_TYPE_ID(ssg_group_descriptor)
 
 namespace bpl = boost::python;
 
@@ -33,11 +35,12 @@ static mobject_provider_t pymobject_provider_register(
         margo_instance_id mid, uint8_t mplex_id,
         bake_provider_handle_t bake_ph,
         sdskv_provider_handle_t sdskv_ph,
+        ssg_group_id_t gid,
         const std::string& cluster_file)
 {
     mobject_provider_t provider;
     int ret = mobject_provider_register(mid, mplex_id, MOBJECT_ABT_POOL_DEFAULT, 
-                                        bake_ph, sdskv_ph, cluster_file.c_str(),
+                                        bake_ph, sdskv_ph, gid, cluster_file.c_str(),
                                         &provider);
     if(ret != 0) return NULL;
     else return provider;

@@ -22,6 +22,9 @@ mid.enable_remote_shutdown()
 print "=== Initializing SSG"
 pyssg.init(mid)
 
+print "=== Creating an SSG group"
+group = pyssg.SSGGroup("mobject", comm=MPI.COMM_WORLD, membership_update=None)
+
 this_addr = mid.addr()
 
 pool_name = "/dev/shm/mobject.dat"
@@ -52,7 +55,7 @@ sdskv_provider_handle = sdskv_client.create_provider_handle(this_addr, 1)
 cluster_file = "mobject-cluster.txt"
 print "=== Initializing Mobject provider (cluster file is "+cluster_file+")"
 mobject_provider = MobjectProvider(mid, 1, bake_provider_handle,
-				sdskv_provider_handle, "cluster_file.txt")
+				sdskv_provider_handle, group, "cluster_file.txt")
 
 print "=== Server running at "+str(this_addr)
 
