@@ -32,14 +32,14 @@ BOOST_PYTHON_OPAQUE_SPECIALIZED_TYPE_ID(ssg_group_descriptor)
 namespace bpl = boost::python;
 
 static mobject_provider_t pymobject_provider_register(
-        margo_instance_id mid, uint8_t mplex_id,
+        margo_instance_id mid, uint8_t provider_id,
         bake_provider_handle_t bake_ph,
         sdskv_provider_handle_t sdskv_ph,
         ssg_group_id_t gid,
         const std::string& cluster_file)
 {
     mobject_provider_t provider;
-    int ret = mobject_provider_register(mid, mplex_id, MOBJECT_ABT_POOL_DEFAULT, 
+    int ret = mobject_provider_register(mid, provider_id, MOBJECT_ABT_POOL_DEFAULT, 
                                         bake_ph, sdskv_ph, gid, cluster_file.c_str(),
                                         &provider);
     if(ret != 0) return NULL;
