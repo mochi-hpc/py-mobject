@@ -10,13 +10,20 @@ import sys
 os.environ['OPT'] = " ".join(
 		    flag for flag in opt.split() if flag != '-Wstrict-prototypes'
 		)
+python_version = str(sys.version_info[0])+str(sys.version_info[1])
 
-server_libs = ['boost_python']
-server_libs += pkgconfig.parse('mobject-server')['libraries']
+pk = pkgconfig.parse('mobject')
+server_libraries = pk['libraries']
+server_libraries.append('boost_python'+python_version)
+server_library_dirs = pk['library_dirs']
+server_include_dirs = pk['include_dirs']
+server_include_dirs.append(".")
+
 pymobject_server_module = Extension('_pymobjectserver', ["pymobject/src/server.cpp"],
-		           libraries=server_libs,
-			   include_dirs=['.'],
-			   depends=[])
+        libraries=server_libraries,
+        library_dirs=server_library_dirs,
+        include_dirs=server_include_dirs,
+        depends=["pymobject/src/server.cpp"])
 
 setup(name='pymobject',
       version='0.1',
