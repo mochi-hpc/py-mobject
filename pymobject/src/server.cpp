@@ -3,14 +3,7 @@
  * 
  * See COPYRIGHT in top-level directory.
  */
-#define BOOST_NO_AUTO_PTR
-#include <boost/python.hpp>
-#include <boost/python/return_opaque_pointer.hpp>
-#include <boost/python/handle.hpp>
-#include <boost/python/enum.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/module.hpp>
-#include <boost/python/return_value_policy.hpp>
+#include <pybind11/pybind11.h>
 #include <string>
 #include <vector>
 #include <cstring>
@@ -22,37 +15,40 @@
 #include <bake-client.h>
 #include <ssg.h>
 
-BOOST_PYTHON_OPAQUE_SPECIALIZED_TYPE_ID(margo_instance)
-BOOST_PYTHON_OPAQUE_SPECIALIZED_TYPE_ID(mobject_server_context)
-BOOST_PYTHON_OPAQUE_SPECIALIZED_TYPE_ID(sdskv_server_context_t)
-BOOST_PYTHON_OPAQUE_SPECIALIZED_TYPE_ID(bake_provider_handle)
-BOOST_PYTHON_OPAQUE_SPECIALIZED_TYPE_ID(sdskv_provider_handle)
-BOOST_PYTHON_OPAQUE_SPECIALIZED_TYPE_ID(ssg_group_descriptor)
+namespace py11 = pybind11;
 
-namespace bpl = boost::python;
+typedef py11::capsule pymargo_instance_id;
+typedef py11::capsule pymobject_provider_t;
+typedef py11::capsule pysdskv_provider_t;
+typedef py11::capsule pysdskv_provider_handle_t;
+typedef py11::capsule pybake_provider_handle_t;
+typedef py11::capsule pyssg_group_id_t;
 
-static mobject_provider_t pymobject_provider_register(
-        margo_instance_id mid, uint8_t provider_id,
-        bake_provider_handle_t bake_ph,
-        sdskv_provider_handle_t sdskv_ph,
-        ssg_group_id_t gid,
+#define MID2CAPSULE(__mid)       py11::capsule((void*)(__mid),   "margo_instance_id", nullptr)
+#define MOBJECTPR2CAPSULE(__mpr) py11::capsule((void*)(__mpr),   "mobject_provider_t", nullptr)
+#define SDSKVPR2CAPSULE(__pr)    py11::capsule((void*)(__pr),    "sdskv_provider_t", nullptr)
+#define SDSKVPH2CAPSULE(__ph)    py11::capsule((void*)(__ph),    "sdskv_provider_handle_t", nullptr)
+#define BAKEPH2CAPSULE(__pr)     py11::capsule((void*)(__pr),    "bake_provider_handle_t", nullptr)
+#define SSGID2CAPSULE(__ssgid)   py11::capsule((void*)(__ssgid), "ssg_group_id_t", nullptr)
+
+static pymobject_provider_t pymobject_provider_register(
+        pymargo_instance_id mid, uint8_t provider_id,
+        pybake_provider_handle_t bake_ph,
+        pysdskv_provider_handle_t sdskv_ph,
+        pyssg_group_id_t gid,
         const std::string& cluster_file)
 {
     mobject_provider_t provider;
     int ret = mobject_provider_register(mid, provider_id, MOBJECT_ABT_POOL_DEFAULT, 
                                         bake_ph, sdskv_ph, gid, cluster_file.c_str(),
                                         &provider);
-    if(ret != 0) return NULL;
-    else return provider;
+    if(ret != 0) return py11::none();
+    else return MOBJECTPR2CAPSULE(provider);
 }
 
-BOOST_PYTHON_MODULE(_pymobjectserver)
+PYBIND11_MODULE(_pymobjectserver, m)
 {
-#define ret_policy_opaque bpl::return_value_policy<bpl::return_opaque_pointer>()
-
-    bpl::opaque<mobject_server_context>();
-    bpl::def("register", &pymobject_provider_register, ret_policy_opaque);
-    bpl::def("setup_sdskv_provider", &mobject_sdskv_provider_setup);
-
-#undef ret_policy_opaque
+    m.def("register", &pymobject_provider_register);
+    m.def("setup_sdskv_provider", [](pysdskv_provider_t pr) {
+            return mobject_sdskv_provider_setup(pr); });
 }
