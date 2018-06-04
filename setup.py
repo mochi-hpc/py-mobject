@@ -10,11 +10,8 @@ import sys
 os.environ['OPT'] = " ".join(
 		    flag for flag in opt.split() if flag != '-Wstrict-prototypes'
 		)
-python_version = str(sys.version_info[0])+str(sys.version_info[1])
-
-pk = pkgconfig.parse('mobject')
+pk = pkgconfig.parse('mobject-server')
 server_libraries = pk['libraries']
-server_libraries.append('boost_python'+python_version)
 server_library_dirs = pk['library_dirs']
 server_include_dirs = pk['include_dirs']
 server_include_dirs.append(".")
