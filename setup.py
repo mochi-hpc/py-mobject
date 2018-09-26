@@ -20,6 +20,7 @@ pymobject_server_module = Extension('_pymobjectserver', ["pymobject/src/server.c
         libraries=server_libraries,
         library_dirs=server_library_dirs,
         include_dirs=server_include_dirs,
+        extra_compile_args=['-std=c++11'],
         depends=["pymobject/src/server.cpp"])
 
 setup(name='pymobject',
