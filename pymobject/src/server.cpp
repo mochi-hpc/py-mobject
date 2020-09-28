@@ -22,14 +22,13 @@ typedef py11::capsule pymobject_provider_t;
 typedef py11::capsule pysdskv_provider_t;
 typedef py11::capsule pysdskv_provider_handle_t;
 typedef py11::capsule pybake_provider_handle_t;
-typedef py11::capsule pyssg_group_id_t;
+typedef ssg_group_id_t pyssg_group_id_t;
 
 #define MID2CAPSULE(__mid)       py11::capsule((void*)(__mid),   "margo_instance_id", nullptr)
 #define MOBJECTPR2CAPSULE(__mpr) py11::capsule((void*)(__mpr),   "mobject_provider_t", nullptr)
 #define SDSKVPR2CAPSULE(__pr)    py11::capsule((void*)(__pr),    "sdskv_provider_t", nullptr)
 #define SDSKVPH2CAPSULE(__ph)    py11::capsule((void*)(__ph),    "sdskv_provider_handle_t", nullptr)
 #define BAKEPH2CAPSULE(__pr)     py11::capsule((void*)(__pr),    "bake_provider_handle_t", nullptr)
-#define SSGID2CAPSULE(__ssgid)   py11::capsule((void*)(__ssgid), "ssg_group_id_t", nullptr)
 
 static pymobject_provider_t pymobject_provider_register(
         pymargo_instance_id mid, uint8_t provider_id,
@@ -49,6 +48,6 @@ static pymobject_provider_t pymobject_provider_register(
 PYBIND11_MODULE(_pymobjectserver, m)
 {
     m.def("register", &pymobject_provider_register);
-    m.def("setup_sdskv_provider", [](pysdskv_provider_t pr) {
-            return mobject_sdskv_provider_setup(pr); });
+    m.def("setup_sdskv_provider", [](pysdskv_provider_t pr, const std::string& path, sdskv_db_type_t backend) {
+            return mobject_sdskv_provider_setup(pr, path.c_str(), backend); });
 }
